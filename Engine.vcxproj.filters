@@ -21,4 +21,8 @@
     <ClInclude Include="ModuleRenderExercise.h" />
     <ClInclude Include="ModuleProgram.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="vertexShader.txt" />
+    <Text Include="fragmentShader.txt" />
+  </ItemGroup>
 </Project>

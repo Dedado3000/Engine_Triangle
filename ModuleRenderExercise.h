@@ -18,6 +18,11 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 
+	//Triangle
+	unsigned CreateTriangleVBO();
+	void DestroyVBO(unsigned vbo);
+	void RenderVBO(unsigned vbo, unsigned program);
+
 private:
-	unsigned int VBO;
+	unsigned int ourVbo;
 };
