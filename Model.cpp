@@ -1,9 +1,9 @@
 #include "Model.h"
-#include "assimp/cimport.h"
-#include "assimp/postprocess.h"
 #include "Application.h"
 #include "ModuleTexture.h"
-#include "Mesh.h"
+
+#include "assimp/cimport.h"
+#include "assimp/postprocess.h"
 
 using namespace std;
 
@@ -20,11 +20,10 @@ Model::~Model()
 void Model::Load(const char* file_name)
 {
 	
-	const aiScene* scene = aiImportFile(file_name, aiProcessPreset_TargetRealtime_MaxQuality);
+	scene = aiImportFile(file_name, aiProcessPreset_TargetRealtime_MaxQuality);
 	if (scene)
 	{
 		LoadMaterials(scene);
-		Mesh meshScene;
 		meshScene.Load(scene->mMeshes, scene->mNumMeshes);
 	}
 	else
@@ -48,3 +47,7 @@ void Model::LoadMaterials(const aiScene* scene)
 	}
 }
 
+void Model::Draw()
+{
+	meshScene.Draw(materials);
+}

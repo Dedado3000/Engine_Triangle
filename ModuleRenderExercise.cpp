@@ -29,9 +29,9 @@ ModuleRenderExercise::~ModuleRenderExercise()
 // Called before render is available
 bool ModuleRenderExercise::Init()
 {
+	chargedModel.Load("BakerHouse.fbx");
 
-
-	ourVbo = CreateTriangleVBO();
+	//ourVbo = CreateTriangleVBO();
 
 	return true;
 }
@@ -47,6 +47,7 @@ update_status ModuleRenderExercise::Update()
 	
 	//RenderVBO(ourVbo, App->program->program_id);
 	RenderTriangle(ourVbo, App->program->program_id);
+	chargedModel.Draw();
 	return UPDATE_CONTINUE;
 }
 
@@ -140,7 +141,7 @@ void ModuleRenderExercise::RenderTriangle(unsigned vbo, unsigned program)
 
 	float4x4 proj = frust.ProjectionMatrix();
 	float4x4 view = frust.ViewMatrix();
-
+	/*
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glEnableVertexAttribArray(0);
 
@@ -168,7 +169,7 @@ void ModuleRenderExercise::RenderTriangle(unsigned vbo, unsigned program)
 
 	// TODO: bind buffer and vertex attributes
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-
+	*/
 
 	//Calliong draw Module Debug
 
