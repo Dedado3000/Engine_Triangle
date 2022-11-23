@@ -1,6 +1,10 @@
 #pragma once
 #include "Module.h"
+#include "ModuleProgram.h"
 #include "Globals.h"
+
+#include "DirectXTex.h"
+#include "GL\glew.h"
 
 struct SDL_Texture;
 struct SDL_Renderer;
@@ -22,7 +26,9 @@ public:
 	unsigned CreateTriangleVBO();
 	void DestroyVBO(unsigned vbo);
 	void RenderVBO(unsigned vbo, unsigned program);
+	void RenderTriangle(unsigned vbo, unsigned program);
 
 private:
 	unsigned int ourVbo;
+	GLuint textureID;
 };

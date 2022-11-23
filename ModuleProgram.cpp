@@ -71,7 +71,7 @@ unsigned ModuleProgram::CreateProgram(unsigned vtx_shader, unsigned frg_shader)
             int written = 0;
             char* info = (char*)malloc(len);
             glGetProgramInfoLog(program_id, len, &written, info);
-            LOG("Program Log Info: %s", info);
+            LOG_APP("Program Log Info: %s", info);
             free(info);
         }
     }
@@ -115,7 +115,7 @@ unsigned ModuleProgram::CompileShader(unsigned type, const char* source)
             int written = 0;
             char* info = (char*)malloc(len);
             glGetShaderInfoLog(shader_id, len, &written, info);
-            LOG("Log Info: %s", info);
+            LOG_APP("Log Info: %s", info);
             free(info);
         }
     }

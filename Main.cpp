@@ -23,29 +23,37 @@ int main(int argc, char ** argv)
 	int main_return = EXIT_FAILURE;
 	main_states state = MAIN_CREATION;
 
+
 	while (state != MAIN_EXIT)
 	{
+
 		switch (state)
 		{
 		case MAIN_CREATION:
 
-			LOG("Application Creation --------------");
+			LOG_APP("Application Creation --------------");
 			App = new Application();
 			state = MAIN_START;
 			break;
 
 		case MAIN_START:
 
-			LOG("Application Init --------------");
+			LOG_APP("Application Init --------------");
 			if (App->Init() == false)
 			{
-				LOG("Application Init exits with error -----");
+				LOG_APP("Application Init exits with error -----");
 				state = MAIN_EXIT;
 			}
 			else
 			{
 				state = MAIN_UPDATE;
-				LOG("Application Update --------------");
+				LOG_APP("Application Update --------------");
+			}
+
+			if (App->Start() == false)
+			{
+				LOG_APP("Application Init exits with error -----");
+				state = MAIN_EXIT;
 			}
 
 			break;
@@ -56,7 +64,7 @@ int main(int argc, char ** argv)
 
 			if (update_return == UPDATE_ERROR)
 			{
-				LOG("Application Update exits with error -----");
+				LOG_APP("Application Update exits with error -----");
 				state = MAIN_EXIT;
 			}
 
@@ -67,10 +75,10 @@ int main(int argc, char ** argv)
 
 		case MAIN_FINISH:
 
-			LOG("Application CleanUp --------------");
+			LOG_APP("Application CleanUp --------------");
 			if (App->CleanUp() == false)
 			{
-				LOG("Application CleanUp exits with error -----");
+				LOG_APP("Application CleanUp exits with error -----");
 			}
 			else
 				main_return = EXIT_SUCCESS;
@@ -84,6 +92,6 @@ int main(int argc, char ** argv)
 	}
 
 	delete App;
-	LOG("Bye :)\n");
+	LOG_APP("Bye :)\n");
 	return main_return;
 }

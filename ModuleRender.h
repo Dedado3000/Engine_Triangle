@@ -20,7 +20,7 @@ public:
 	void WindowResized(unsigned width, unsigned height);
 
 
-private:
+//private:
 	void* context;
 
 };
