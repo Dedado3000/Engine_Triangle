@@ -6,6 +6,8 @@
 #include "DirectXTex.h"
 #include "GL\glew.h"
 
+#include "Model.h"
+
 struct SDL_Texture;
 struct SDL_Renderer;
 struct SDL_Rect;
@@ -31,4 +33,5 @@ public:
 private:
 	unsigned int ourVbo;
 	GLuint textureID;
+	Model chargedModel;
 };
