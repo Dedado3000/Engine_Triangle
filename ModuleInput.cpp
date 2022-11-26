@@ -66,6 +66,9 @@ update_status ModuleInput::PreUpdate()
                 else if (sdlEvent.button.button == SDL_BUTTON_MIDDLE)
                     App->camera->middleClick = false;
                 break;
+            case SDL_MOUSEWHEEL:
+                App->camera->mouseWheel = - sdlEvent.wheel.y;
+                break;
         }
     }
     ImGui_ImplSDL2_ProcessEvent(&sdlEvent);

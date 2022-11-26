@@ -30,8 +30,8 @@ public:
 	void RenderVBO(unsigned vbo, unsigned program);
 	void RenderTriangle(unsigned vbo, unsigned program);
 
+	Model chargedModel;
 private:
 	unsigned int ourVbo;
 	GLuint textureID;
-	Model chargedModel;
 };

@@ -16,8 +16,13 @@ public:
 	void CreateVAO();
 
 	void Draw(const std::vector<unsigned>& model_textures);
+	void MiddlePoint(float &xValue, float &yValue, float &zValue);
 
 	unsigned int vbo,ebo, vao;
 	int num_index;
 	int num_vertex;
+	std::vector < float > vertexValuesX;
+	std::vector < float > vertexValuesY;
+	std::vector < float > vertexValuesZ;
+	
 };
