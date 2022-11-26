@@ -56,6 +56,11 @@ void Mesh::LoadVBO(const aiMesh* mesh)
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	num_vertex = mesh->mNumVertices;
+	for (int i = 0; i < sizeof( mesh->mVertices ) ; i++) {
+		vertexValuesX.push_back(mesh->mVertices[i].x);
+		vertexValuesY.push_back(mesh->mVertices[i].y);
+		vertexValuesZ.push_back(mesh->mVertices[i].z);
+	}
 }
 
 void Mesh::LoadEBO(const aiMesh* mesh)
@@ -110,4 +115,26 @@ void Mesh::Draw(const std::vector<unsigned>& model_textures)
 	glUniform1i(glGetUniformLocation(program, "diffuse"), 0);
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, num_index, GL_UNSIGNED_INT, nullptr);
+}
+
+void Mesh::MiddlePoint(float& xValue, float& yValue, float& zValue)
+{
+	xValue = 0;
+	yValue = 0;
+	zValue = 0;
+	for (float value : vertexValuesX)
+	{
+		xValue += value;
+	}
+	for (float value : vertexValuesY)
+	{
+		yValue += value;
+	}
+	for (float value : vertexValuesZ)
+	{
+		zValue += value;
+	}
+	xValue = xValue / vertexValuesX.size();
+	yValue = yValue / vertexValuesY.size();
+	zValue = zValue / vertexValuesZ.size();
 }

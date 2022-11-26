@@ -3,6 +3,11 @@
 #include "Application.h"
 #include "ModuleWindow.h"
 #include "ModuleInput.h"
+#include "ModuleRenderExercise.h"
+
+
+#include "Model.h"
+#include "Mesh.h"
 
 #include "SDL.h"
 #include "SDL/include/SDL.h"
@@ -29,15 +34,15 @@ bool ModuleCamera::Init()
 
 bool ModuleCamera::Start()
 {
-	position = float3(0.0f, 4.0f, 10.0f);
+	position = float3(8.0f, 2.0f, 8.0f);
 	int w, h;
 	fov = 90.0f;
 	SDL_GetWindowSize(App->window->window, &w, &h);
 
 	frustum.SetPerspective(math::pi / 4.0f, 2.f * atanf(tanf(math::pi / 4.0f * 0.5f) * (w / h)));
 	//frustum.SetPos(float3::zero);
-	frustum.SetPos(float3(0.0f, 4.0f, 20.0f));
-	frustum.SetFront(-float3(0,0.2f,1.f));
+	frustum.SetPos(position);
+	frustum.SetFront(-float3(0.5f,0.f,0.5f));
 	frustum.SetUp(float3::unitY);
 	frustum.SetViewPlaneDistances(0.1f, 100.0f);
 	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
@@ -66,7 +71,16 @@ update_status ModuleCamera::PreUpdate()
 
 	float moveY = (clickedY - y);
 	float moveX = (clickedX - x) ;
-	//Drag Camera
+
+	//e. Holding SHIFT duplicates movement speed.
+	float speed = 1;
+	if (keyboard[SDL_SCANCODE_LSHIFT] || keyboard[SDL_SCANCODE_RSHIFT])
+	{
+		speed = 2;
+	}
+
+	//Drag Camera - No in Assigment 1
+	/*
 	if (leftClick && middleClick && !rightClick)
 	{
 
@@ -74,45 +88,65 @@ update_status ModuleCamera::PreUpdate()
 		position -= float3(-moveX * 0.01 * App->dt, moveY * 0.01 * App->dt, 0);
 
 	}
-	//Camera Move and Zoom and Rotate
+	*/
+	//Camera Move and Rotate
+	//a. While Right clicking, “WASD” fps-like movement and free look around must be enabled
 	if(rightClick && !leftClick && !middleClick)
 	{
 		//frustum.SetFront(-float3(0, 0.2f, 1.f));
 
 		if (keyboard[SDL_SCANCODE_Q])
 		{
-			position -= float3(0, 4*App->dt, 0);
+			position -= float3(0, 4 * App->dt * speed, 0);
 		}
 		if (keyboard[SDL_SCANCODE_E])
 		{
-			position -= float3(0, -4 * App->dt, 0);
+			position -= float3(0, -4 * App->dt * speed, 0);
 		}
 		if (keyboard[SDL_SCANCODE_W])
 		{
-			float3 f = frustum.Front();
-			position -= float3(-f.x * App->dt * 4, -f.y * App->dt * 4, -f.z *App->dt * 4);
+			position -= float3(-f.x * App->dt * 4 * speed, -f.y * App->dt * 4 * speed, -f.z * App->dt * 4 * speed);
 		}
 		if (keyboard[SDL_SCANCODE_S])
 		{
-			position += float3(-f.x * App->dt * 4, -f.y * App->dt * 4, -f.z * App->dt * 4);
-		}
-		if (keyboard[SDL_SCANCODE_S])
-		{
-			position += float3(-f.x * App->dt * 4, -f.y * App->dt * 4, -f.z * App->dt * 4);
+			position += float3(-f.x * App->dt * 4 * speed, -f.y * App->dt * 4 * speed, -f.z * App->dt * 4 * speed);
 		}
 		if (keyboard[SDL_SCANCODE_A])
 		{
-			position += float3(-fLat.x * App->dt * 4, -fLat.y * App->dt * 4, -fLat.z * App->dt * 4);
+			position += float3(-fLat.x * App->dt * 4 * speed, -fLat.y * App->dt * 4 * speed, -fLat.z * App->dt * 4 * speed);
 		}
 		if (keyboard[SDL_SCANCODE_D])
 		{
-			position -= float3(-fLat.x * App->dt * 4, -fLat.y * App->dt * 4, -fLat.z * App->dt * 4);
+			position -= float3(-fLat.x * App->dt * 4 * speed, -fLat.y * App->dt * 4 * speed, -fLat.z * App->dt * 4 * speed);
 		}
 
-		//Zoom
+		// Free Look
+		//2d plane moving
+		//Acording with the look, the xyz space is compeled with 2 directions in a 2D plane and a direction for the 3rd, 
+		//we will use the move of the mouse in Y for the 3rd direction and use the X of the mouse for left and right direction
+		int multiplyX = 1;
+		int multiplyZ = 1;
+		float rotationSpeed = 0.0015;
+		GetRotationMovement(f.x, f.z, multiplyX, multiplyZ, moveX);
+		float3 rotationXZ(float3{f.x + multiplyX * App->dt * speed * rotationSpeed * moveX, f.y, f.z + multiplyZ * App->dt * speed * rotationSpeed * moveX });
+		rotationXZ = rotationXZ.Normalized();
+		f = rotationXZ;
+		frustum.SetFront(f);
+		
+
+		float3 upVector = frustum.Front();
+		float moveUP = upVector.y + moveY * App->dt * 0.2;
+		if (moveUP > 1.f) moveUP = 1.f;
+		if (moveUP < -30.f) 
+			moveUP = -1.f;
+		float3 freeLook{ upVector.x, moveUP , upVector.z };
+		//frustum.SetFront(freeLook);
+
+		int test = 0;
+
 		/*
-		Temporal, must be in mouse scroll
-		*/
+		//Zoom
+		//Deprecated from this method to mousewheel
 		if (keyboard[SDL_SCANCODE_LALT])
 		{
 			float zoomY = (clickedY - y) * 3 * App->dt;
@@ -125,12 +159,69 @@ update_status ModuleCamera::PreUpdate()
 			frustum.SetHorizontalFovAndAspectRatio(fov , 1.3f);
 
 		}
+		*/
 	}
 
+	//b. Mouse wheel should zoom in and out.
+	if (mouseWheel!=0)
+	{
+		float zoomY = mouseWheel * speed * 3 * App->dt;
+		fov = fov + zoomY;
+		clickedY = y;
+		if (fov < 88)
+			fov = 88;
+		if (fov > 90.6)
+			fov = 90.6;
+		frustum.SetHorizontalFovAndAspectRatio(fov, 1.3f);
+		mouseWheel = 0;
+	}
+	// d. Pressing “f” should focus the camera around the geometry.
+	if (keyboard[SDL_SCANCODE_F]) {
+		FocusPoint();
+
+	}
+	//c. Alt+Left click should orbit the object.
+	if (keyboard[SDL_SCANCODE_LALT] && leftClick && !rightClick)
+	{
+		FocusPoint();
+		float xVal = 0;
+		float yVal = 0;
+		float zVal = 0;
+		App->renderExercise->chargedModel.meshScene.MiddlePoint(xVal, zVal, yVal);
+		float distance1 =sqrt(  pow(position.x - xVal,2) + pow(position.y - yVal,2) + pow(position.z - zVal,2) );
+
+		//position += float3(f.x * App->dt * 4 * speed * moveX, f.y * App->dt * 4 * speed * moveX, f.z * App->dt * 4 * speed * moveX);
+		float baseRot = 0.015f;
+		//Moving in XZ 
+		float3 rotationXZ{ -fLat.x * App->dt * speed * moveX * baseRot, /*-fLat.y * App->dt * speed * moveX * baseRot */ 0, -fLat.z * App->dt * speed * moveX * baseRot };
+		position += rotationXZ;
+		float3 rotationY{ 0, App->dt * speed * moveY * baseRot , 0 };
+		position += rotationY;
+
+		//Move the camera forward
+		//Calculate the diference of distance Focus->P1 to distance Focus->P2
+		frustum.SetPos(position);
+		f = frustum.Front();
+		FocusPoint();
+		float distance2 = sqrt(pow(position.x - xVal, 2) + pow(position.y - yVal, 2) + pow(position.z - zVal, 2));
+		float calculatedMovement = distance2 - distance1;
+		position -= float3(-f.x * calculatedMovement, -f.y * calculatedMovement, -f.z *  calculatedMovement);
+	}
+
+	if (keyboard[SDL_SCANCODE_I]) {
+		frustum.SetFront(-float3(0.5f, 0.f, 0.5f));
+
+	}
+	if (keyboard[SDL_SCANCODE_O]) {
+		frustum.SetFront(-float3(-1.f, 0.5f, 0.f));
+
+	}
 
 	frustum.SetPos(position);
+	frustum.SetHorizontalFovAndAspectRatio(fov, 1.3f);
 	return UPDATE_CONTINUE;
 }
+
 
 // Called every draw update
 update_status ModuleCamera::Update()
@@ -151,3 +242,71 @@ bool ModuleCamera::CleanUp()
 	return true;
 }
 
+
+void ModuleCamera::FocusPoint()
+{
+
+	float xVal = 0;
+	float yVal = 0;
+	float zVal = 0;
+	App->renderExercise->chargedModel.meshScene.MiddlePoint(xVal, yVal, zVal);
+	float3 totaldirectionVector{ xVal - position.x  , zVal - position.y   , yVal - position.z };
+	float3 directionVector = totaldirectionVector.Normalized();
+	//float absZ = abs(directionVector.z);
+	//float maxim = max(abs(directionVector.x), max(abs(directionVector.y), absZ));
+	//float3 vectorTest{ directionVector.x / maxim, directionVector.y / maxim, directionVector.z / maxim };
+	frustum.SetFront(directionVector);
+}
+
+void ModuleCamera::GetRotationMovement(float x, float z, int& valueX, int& valueZ, int motion)
+{
+	//moving right
+	/*
+	if (motion > 0) {
+		if (x >= 0 && z >= 0)
+		{
+			valueX = 1;
+			valueZ = -1;
+		}
+		else if (x >= 0 && z <= 0)
+		{
+			valueX = -1;
+			valueZ = -1;
+		}
+		else if (x <= 0 && z >= 0)
+		{
+			valueX = 1;
+			valueZ = 1;
+		}
+		else if (x <= 0 && z <= 0) 
+		{
+			valueX = -1;
+			valueZ = 1;
+		}
+	}
+	else {
+	*/
+	if (x >= 0 && z >= 0)
+	{
+		valueX = 1;
+		valueZ = -1;
+	}
+	else if (x >= 0 && z <= 0)
+	{
+		valueX = -1;
+		valueZ = -1;
+	}
+	else if (x <= 0 && z >= 0)
+	{
+		valueX = 1;
+		valueZ = 1;
+	}
+	else if (x <= 0 && z <= 0)
+	{
+		valueX = -1;
+		valueZ = 1;
+	}
+
+	//}
+
+}
