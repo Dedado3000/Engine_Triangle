@@ -17,10 +17,10 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 
+	boolean editorWindows = true;
 
 private:
 
-	boolean editorWindows = true;
 	float scale = 1.f;
 	update_status continueUpdate = UPDATE_CONTINUE;
 	//float ms_fps[25];

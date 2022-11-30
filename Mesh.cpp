@@ -25,6 +25,9 @@ Mesh::~Mesh()
 void Mesh::Load(aiMesh** mesh, unsigned int numMeshes)
 {
 	/**/
+	vertexValuesX.clear();
+	vertexValuesY.clear();
+	vertexValuesZ.clear();
 	for (int i = 0; i < numMeshes; i++)
 	{
 		LoadVBO(mesh[i]);
@@ -137,4 +140,23 @@ void Mesh::MiddlePoint(float& xValue, float& yValue, float& zValue)
 	xValue = xValue / vertexValuesX.size();
 	yValue = yValue / vertexValuesY.size();
 	zValue = zValue / vertexValuesZ.size();
+}
+
+
+void Mesh::FarAwayPoint(float& xValue, float& yValue, float& zValue) {
+	for (float value : vertexValuesX)
+	{
+		if(value>xValue)
+			xValue = value;
+	}
+	for (float value : vertexValuesY)
+	{
+		if (value > yValue)
+			yValue = value;
+	}
+	for (float value : vertexValuesZ)
+	{
+		if (value > zValue)
+			zValue = value;
+	}
 }

@@ -99,7 +99,7 @@ unsigned ModuleRenderExercise::CreateTriangleVBO()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo); // set vbo active
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vtx_data), vtx_data, GL_STATIC_DRAW);
 
-	textureID = App->textures->LoadTexture("Test-image-Baboon.ppm");
+	textureID = App->textures->LoadTexture("Test-image-Baboon.ppm", "", "");
 
 	/**/
 

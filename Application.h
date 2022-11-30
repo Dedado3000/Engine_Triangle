@@ -16,6 +16,7 @@ class ModuleEditor;
 class ModuleCamera;
 class ModuleDebugDraw;
 class ModuleTexture;
+class ModuleConsole;
 
 
 //class Timer;
@@ -33,6 +34,7 @@ public:
 	bool CleanUp();
 
 public:
+	ModuleConsole* console = nullptr;
 	ModuleRender* renderer = nullptr;
 	ModuleWindow* window = nullptr;
 	ModuleCamera* camera = nullptr;

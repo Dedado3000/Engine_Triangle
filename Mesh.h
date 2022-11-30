@@ -17,6 +17,7 @@ public:
 
 	void Draw(const std::vector<unsigned>& model_textures);
 	void MiddlePoint(float &xValue, float &yValue, float &zValue);
+	void FarAwayPoint(float& xValue, float& yValue, float& zValue);
 
 	unsigned int vbo,ebo, vao;
 	int num_index;

@@ -2,6 +2,7 @@
 
 #include "Geometry/Frustum.h"
 #include "Math/float3.h"
+#include "Math/float3x3.h"
 
 #include "Module.h"
 #include "Globals.h"
@@ -21,6 +22,8 @@ public:
 
 	void FocusPoint();
 	void GetRotationMovement(float x, float z, int& valueX, int& valueZ, int motion);
+	void Resize();
+	void Relocate();
 
 	float3 position;
 	bool leftClick = false;

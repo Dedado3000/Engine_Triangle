@@ -65,6 +65,7 @@
     <ClCompile Include="ModuleTexture.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="ModuleConsole.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="ModuleTexture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="ModuleConsole.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="vertexShader.txt" />

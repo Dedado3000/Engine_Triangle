@@ -1,7 +1,10 @@
 #include "ModuleTexture.h"
+#include "Application.h"
+#include "ModuleConsole.h"
 
-
+#include <string>
 using namespace DirectX;
+using namespace std;
 
 ModuleTexture::ModuleTexture()
 {}
@@ -18,32 +21,67 @@ bool ModuleTexture::Init()
 	return ret;
 }
 
-GLuint ModuleTexture::LoadTexture(const char* image_file_name) {
+GLuint ModuleTexture::LoadTexture(const char* image_file_name, const char* route_path, const char* route_fbx) {
 	GLuint image;
-
+	HRESULT res;
+	const int size_image_file_name = strlen(image_file_name);
 	//First Load full 
-	image = FullLoadFromRoute(image_file_name);
+	image = FullLoadFromRoute(image_file_name, res);
 
-	//Charging texture
-	/*
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture_object);
-	glUniform1i(glGetUniformLocation(program, "mytexture"), 0);
-	namespace directX
-	*/
+	App->console->AddToConsole("------CHARGING NEW TEXTURE------");
+	if (FAILED(res)) {
+		const char* log = "Not Found at the route from Path Route "; //+ route_path + "/" + image_file_name ;
+		App->console->AddToConsole(log);
+
+		//route_fbx + route_path
+		char* fbx = new char[strlen(image_file_name) + strlen(route_fbx) + 1 + 1]; // + 1 char + 1 for null;
+		strcpy(fbx, route_fbx);
+		strcat(fbx, image_file_name);
+
+		image = FullLoadFromRoute(fbx, res);
+		if (FAILED(res)) {
+			const char* log = "Not Found at the route from PBX"; //+ route_fbx + "/" + image_file_name ;
+			App->console->AddToConsole(log);
+
+
+			char* ret = new char[strlen(image_file_name) + 10 + 1 + 1]; // + 1 char + 1 for null;
+			strcpy(ret, "Textures\\");
+			strcat(ret, image_file_name);
+			image = FullLoadFromRoute(ret, res);
+			if (!FAILED(res))
+			{
+				App->console->AddToConsole("Loaded Texture from Texture Carpet");
+			}
+			else {
+				const char* log = "Not Found at the route from Texture Carpet";
+			}
+		}
+		else {
+			App->console->AddToConsole("Loaded Texture from FBX Path");
+		}
+	}
+	else {
+		App->console->AddToConsole("Loaded Texture from Path Route");
+	}
+	
+	if (FAILED(res))
+	{
+		App->console->AddToConsole("Texture not found");
+	}
+	
 
 	return image;
 }
 
 
-GLuint ModuleTexture::FullLoadFromRoute(const char* rute_image_file_name) {
+GLuint ModuleTexture::FullLoadFromRoute(const char* rute_image_file_name, HRESULT &res) {
 	GLuint textureID=0;
 	ScratchImage sImage;
 	wchar_t* w_image = new wchar_t[strlen(rute_image_file_name) + 1];
 	mbstowcs_s(NULL, w_image, strlen(rute_image_file_name) + 1, rute_image_file_name, strlen(rute_image_file_name));
 
 
-	HRESULT res = LoadFromDDSFile(w_image, DDS_FLAGS_NONE, nullptr, sImage);
+	res = LoadFromDDSFile(w_image, DDS_FLAGS_NONE, nullptr, sImage);
 	
 	if (FAILED(res))
 	{

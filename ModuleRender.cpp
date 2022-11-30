@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleRender.h"
+//#include "ModuleCamera.h"
 #include "ModuleWindow.h"
 #include "SDL.h"
 #include "GL\glew.h"
@@ -93,5 +94,6 @@ bool ModuleRender::CleanUp()
 
 void ModuleRender::WindowResized(unsigned width, unsigned height)
 {
+	//App->camera->Resize();
 }
 

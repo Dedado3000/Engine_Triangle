@@ -3,6 +3,7 @@
 #include "ModuleEditor.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
+#include "ModuleConsole.h"
 #include "SDL.h"
 #include "Application.h"
 #include "Application.h"
@@ -66,10 +67,15 @@ update_status ModuleEditor::Update()
 	if (ImGui::BeginMainMenuBar())
 	{
 
-		if (ImGui::BeginMenu("desp"))
-		{
-			ImGui::EndMenu();
-		}
+		if (ImGui::Button("exit"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			return UPDATE_STOP;
+
+		if (ImGui::MenuItem("About"))
+			App->console->AddToConsole("Visit the github page: https://github.com/Dedado3000/Engine_Triangle");
+
+
+		if (ImGui::MenuItem("Editor"))
+			editorWindows = !editorWindows;
 	}
 	ImGui::EndMainMenuBar();
 
@@ -89,15 +95,22 @@ update_status ModuleEditor::Update()
 			ImGui::PlotHistogram("##framerate", &App->timer.fps[0], 100, 0, title, 0.0f, 160.0f, ImVec2(310, 160));
 		}
 		ImGui::End();
+
+
+
+		if (ImGui::Begin("HardWare"))
+		{
+			ImGui::Text("My HardWare is");
+		}
+		ImGui::End();
+
+		if (ImGui::Begin("Console"))
+		{
+			App->console->WriteInConsole();
+		}
+		ImGui::End();
+
 	}
-
-
-
-	if (ImGui::Begin("HardWare"))
-	{
-		ImGui::Text("My HardWare is");
-	}
-	ImGui::End();
 
 	App->timer.SetScale(scale);
 

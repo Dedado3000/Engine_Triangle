@@ -44,9 +44,9 @@ bool ModuleCamera::Start()
 	frustum.SetPos(position);
 	frustum.SetFront(-float3(0.5f,0.f,0.5f));
 	frustum.SetUp(float3::unitY);
-	frustum.SetViewPlaneDistances(0.1f, 100.0f);
+	frustum.SetViewPlaneDistances(0.1f, 300.0f);
 	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
-	frustum.SetHorizontalFovAndAspectRatio(fov, 1.3f);
+	frustum.SetHorizontalFovAndAspectRatio(fov, (w / h));
 
 	//frustum.nearPlaneDistance = 0.1f;
 	//frustum.farPlaneDistance = 100.0f;
@@ -79,16 +79,6 @@ update_status ModuleCamera::PreUpdate()
 		speed = 2;
 	}
 
-	//Drag Camera - No in Assigment 1
-	/*
-	if (leftClick && middleClick && !rightClick)
-	{
-
-		float3 f = frustum.Front();
-		position -= float3(-moveX * 0.01 * App->dt, moveY * 0.01 * App->dt, 0);
-
-	}
-	*/
 	//Camera Move and Rotate
 	//a. While Right clicking, “WASD” fps-like movement and free look around must be enabled
 	if(rightClick && !leftClick && !middleClick)
@@ -119,30 +109,21 @@ update_status ModuleCamera::PreUpdate()
 		{
 			position -= float3(-fLat.x * App->dt * 4 * speed, -fLat.y * App->dt * 4 * speed, -fLat.z * App->dt * 4 * speed);
 		}
+		frustum.SetPos(position);
 
 		// Free Look
 		//2d plane moving
 		//Acording with the look, the xyz space is compeled with 2 directions in a 2D plane and a direction for the 3rd, 
 		//we will use the move of the mouse in Y for the 3rd direction and use the X of the mouse for left and right direction
-		int multiplyX = 1;
-		int multiplyZ = 1;
-		float rotationSpeed = 0.0015;
-		GetRotationMovement(f.x, f.z, multiplyX, multiplyZ, moveX);
-		float3 rotationXZ(float3{f.x + multiplyX * App->dt * speed * rotationSpeed * moveX, f.y, f.z + multiplyZ * App->dt * speed * rotationSpeed * moveX });
-		rotationXZ = rotationXZ.Normalized();
-		f = rotationXZ;
-		frustum.SetFront(f);
-		
+		if (!keyboard[SDL_SCANCODE_F]) {
 
-		float3 upVector = frustum.Front();
-		float moveUP = upVector.y + moveY * App->dt * 0.2;
-		if (moveUP > 1.f) moveUP = 1.f;
-		if (moveUP < -30.f) 
-			moveUP = -1.f;
-		float3 freeLook{ upVector.x, moveUP , upVector.z };
-		//frustum.SetFront(freeLook);
+			float rotationSpeed = 0.006;
+			float3x3 rotationY = float3x3::RotateY( App->dt * speed * rotationSpeed * moveX);
+			frustum.SetWorldMatrix(rotationY * frustum.WorldMatrix());
+			float3x3 rotationAxis = float3x3::RotateAxisAngle(frustum.WorldRight(), App->dt * speed * rotationSpeed * moveY);
+			frustum.SetWorldMatrix(rotationAxis * frustum.WorldMatrix());
 
-		int test = 0;
+		}
 
 		/*
 		//Zoom
@@ -213,7 +194,7 @@ update_status ModuleCamera::PreUpdate()
 
 	}
 	if (keyboard[SDL_SCANCODE_O]) {
-		frustum.SetFront(-float3(-1.f, 0.5f, 0.f));
+		frustum.SetFront(-float3(0.5f, 0.5f, 0.f));
 
 	}
 
@@ -250,42 +231,15 @@ void ModuleCamera::FocusPoint()
 	float yVal = 0;
 	float zVal = 0;
 	App->renderExercise->chargedModel.meshScene.MiddlePoint(xVal, yVal, zVal);
-	float3 totaldirectionVector{ xVal - position.x  , zVal - position.y   , yVal - position.z };
+	float3 totaldirectionVector = float3{ xVal, yVal, zVal } -frustum.Pos();
 	float3 directionVector = totaldirectionVector.Normalized();
-	//float absZ = abs(directionVector.z);
-	//float maxim = max(abs(directionVector.x), max(abs(directionVector.y), absZ));
-	//float3 vectorTest{ directionVector.x / maxim, directionVector.y / maxim, directionVector.z / maxim };
-	frustum.SetFront(directionVector);
+	float3 up = frustum.WorldRight().Cross(directionVector).Normalized();
+	float3x4 look = frustum.WorldMatrix().LookAt(float3::unitZ, frustum.Pos() -float3{ xVal, yVal, zVal } , float3::unitY, float3::unitY);
+	frustum.SetWorldMatrix(look );
 }
 
 void ModuleCamera::GetRotationMovement(float x, float z, int& valueX, int& valueZ, int motion)
 {
-	//moving right
-	/*
-	if (motion > 0) {
-		if (x >= 0 && z >= 0)
-		{
-			valueX = 1;
-			valueZ = -1;
-		}
-		else if (x >= 0 && z <= 0)
-		{
-			valueX = -1;
-			valueZ = -1;
-		}
-		else if (x <= 0 && z >= 0)
-		{
-			valueX = 1;
-			valueZ = 1;
-		}
-		else if (x <= 0 && z <= 0) 
-		{
-			valueX = -1;
-			valueZ = 1;
-		}
-	}
-	else {
-	*/
 	if (x >= 0 && z >= 0)
 	{
 		valueX = 1;
@@ -306,7 +260,28 @@ void ModuleCamera::GetRotationMovement(float x, float z, int& valueX, int& value
 		valueX = -1;
 		valueZ = 1;
 	}
+}
 
-	//}
+void ModuleCamera::Resize() {
 
+	int w, h;
+	SDL_GetWindowSize(App->window->window, &w, &h);
+
+	frustum.SetPerspective(math::pi / 4.0f, 2.f * atanf(tanf(math::pi / 4.0f * 0.5f) * (w / h)));
+
+
+	frustum.SetViewPlaneDistances(0.1f, 100.0f);
+	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
+	//frustum.SetHorizontalFovAndAspectRatio(fov, (w / h));
+}
+
+
+void ModuleCamera::Relocate() {
+
+	float xVal = 0;
+	float yVal = 0;
+	float zVal = 0;
+	App->renderExercise->chargedModel.meshScene.FarAwayPoint(xVal, yVal, zVal);
+	position = float3{ xVal * 2, yVal, zVal * 2 };
+	frustum.SetPos(position);
 }

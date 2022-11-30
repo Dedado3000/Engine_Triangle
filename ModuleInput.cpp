@@ -4,9 +4,15 @@
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleRender.h"
+#include "ModuleEditor.h"
+#include "ModuleConsole.h"
+#include "ModuleRenderExercise.h"
 #include "imgui_impl_sdl.h"
 #include "SDL/include/SDL.h"
 
+#include <string>
+
+using namespace std;
 ModuleInput::ModuleInput()
 {}
 
@@ -34,6 +40,7 @@ bool ModuleInput::Init()
 update_status ModuleInput::PreUpdate()
 {
     SDL_Event sdlEvent;
+    string file;
 
     while (SDL_PollEvent(&sdlEvent) != 0)
     {
@@ -45,7 +52,11 @@ update_status ModuleInput::PreUpdate()
                 return UPDATE_STOP;
             case SDL_WINDOWEVENT:
                 if (sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED || sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+                {
                     App->renderer->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
+                    App->camera->Resize();
+
+                }
                 break;
             case SDL_MOUSEBUTTONDOWN:
 
@@ -69,10 +80,32 @@ update_status ModuleInput::PreUpdate()
             case SDL_MOUSEWHEEL:
                 App->camera->mouseWheel = - sdlEvent.wheel.y;
                 break;
+            case SDL_DROPFILE:
+                //string rute=
+                file = sdlEvent.drop.file;
+                if (file.find(".fbx") != string::npos)
+                {
+                    App->renderExercise->chargedModel.ReLoad(sdlEvent.drop.file);
+                    App->camera->Relocate();
+                    App->camera->FocusPoint();
+                }
+                else {
+                    App->console->AddToConsole("Format not valid, please use FBX format");
+                }
+                break;
+            case SDL_KEYDOWN:
+                
+                if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_K)
+                {
+                    App->editor->editorWindows = !App->editor->editorWindows;
+                }
+                break;
         }
     }
     ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
     keyboard = SDL_GetKeyboardState(NULL);
+
+
 
     return UPDATE_CONTINUE;
 }

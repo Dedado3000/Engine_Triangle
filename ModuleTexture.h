@@ -15,8 +15,8 @@ public:
 
 	bool Init();
 
-	GLuint LoadTexture(const char* image_file_name);
-	GLuint FullLoadFromRoute(const char* rute_image_file_name);
+	GLuint LoadTexture(const char* image_file_name, const char* route_path, const char* route_fbx);
+	GLuint FullLoadFromRoute(const char* rute_image_file_name, HRESULT& res);
 
 
 private:

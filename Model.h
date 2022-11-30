@@ -13,7 +13,8 @@ public:
 	~Model();
 
 	void Load(const char* file_name);
-	void LoadMaterials(const aiScene* scene);
+	void ReLoad(const char* file_name);
+	void LoadMaterials(const aiScene* scene, const char* file_name);
 
 	void Draw();
 
