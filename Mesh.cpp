@@ -3,7 +3,6 @@
 #include "Application.h"
 #include "ModuleTexture.h"
 #include "ModuleProgram.h"
-#include "ModuleCamera.h"
 
 #include "assimp/mesh.h"
 //#include "assimp/postprocess.h"
@@ -28,17 +27,27 @@ void Mesh::Load(aiMesh** mesh, unsigned int numMeshes)
 	vertexValuesX.clear();
 	vertexValuesY.clear();
 	vertexValuesZ.clear();
+	position = float3{ 0,0,0 };
+	scale = float3{ 1,1,1 };
+
+	vboV.clear();
+	eboV.clear();
+	vaoV.clear();
+	num_indexV.clear();
+	num_vertexV.clear();
 	for (int i = 0; i < numMeshes; i++)
 	{
 		LoadVBO(mesh[i]);
 		LoadEBO(mesh[i]);
 		CreateVAO();
 	}
+
 	/** /
 	LoadVBO(mesh[0]);
 	LoadEBO(mesh[0]);
 	CreateVAO();
 	/**/
+
 }
 
 void Mesh::LoadVBO(const aiMesh* mesh)
@@ -64,6 +73,8 @@ void Mesh::LoadVBO(const aiMesh* mesh)
 		vertexValuesY.push_back(mesh->mVertices[i].y);
 		vertexValuesZ.push_back(mesh->mVertices[i].z);
 	}
+	num_vertexV.push_back(num_vertex);
+	vboV.push_back(vbo);
 }
 
 void Mesh::LoadEBO(const aiMesh* mesh)
@@ -82,6 +93,9 @@ void Mesh::LoadEBO(const aiMesh* mesh)
 	}
 	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 	num_index = mesh->mNumFaces * 3;
+
+	num_indexV.push_back(num_index);
+	eboV.push_back(ebo);
 }
 
 void Mesh::CreateVAO()
@@ -94,6 +108,7 @@ void Mesh::CreateVAO()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float) * 3 * num_vertex));
+	vaoV.push_back(vao);
 }
 
 
@@ -108,7 +123,9 @@ void Mesh::Draw(const std::vector<unsigned>& model_textures)
 
 	//const float4x4& view = App->camera->GetView();
 	//const float4x4& proj = App->camera->GetProjection();
-	float4x4 model = float4x4::identity;
+	float4x4 model = float4x4::FromTRS(position,
+		/*float4x4::RotateZ(pi / 4.0f)*/ float4x4::RotateZ(0),
+		scale);
 	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, (const float*)&model);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, (const float*)&view);
@@ -116,8 +133,13 @@ void Mesh::Draw(const std::vector<unsigned>& model_textures)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, model_textures[0]); // glBindTexture(GL_TEXTURE_2D, model_textures[material_index]);
 	glUniform1i(glGetUniformLocation(program, "diffuse"), 0);
-	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, num_index, GL_UNSIGNED_INT, nullptr);
+	for (int i = 0; i< vaoV.size(); i++)
+	{
+		glBindVertexArray(vaoV[i]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboV[i]);
+		glDrawElements(GL_TRIANGLES, num_indexV[i], GL_UNSIGNED_INT, nullptr);
+
+	}
 }
 
 void Mesh::MiddlePoint(float& xValue, float& yValue, float& zValue)

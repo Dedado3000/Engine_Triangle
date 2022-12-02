@@ -29,7 +29,7 @@ ModuleRenderExercise::~ModuleRenderExercise()
 // Called before render is available
 bool ModuleRenderExercise::Init()
 {
-	chargedModel.Load("BakerHouse.fbx");
+	chargedModel.Load("Assets//BakerHouse.fbx");
 
 	//ourVbo = CreateTriangleVBO();
 
@@ -99,7 +99,8 @@ unsigned ModuleRenderExercise::CreateTriangleVBO()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo); // set vbo active
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vtx_data), vtx_data, GL_STATIC_DRAW);
 
-	textureID = App->textures->LoadTexture("Test-image-Baboon.ppm", "", "");
+	std:string size_data;
+	textureID = App->textures->LoadTexture("Test-image-Baboon.ppm", "", "", size_data);
 
 	/**/
 

@@ -199,7 +199,9 @@ update_status ModuleCamera::PreUpdate()
 	}
 
 	frustum.SetPos(position);
-	frustum.SetHorizontalFovAndAspectRatio(fov, 1.3f);
+	int w, h;
+	SDL_GetWindowSize(App->window->window, &w, &h);
+	frustum.SetHorizontalFovAndAspectRatio(fov, (float)w/(float)h);
 	return UPDATE_CONTINUE;
 }
 
@@ -272,7 +274,7 @@ void ModuleCamera::Resize() {
 
 	frustum.SetViewPlaneDistances(0.1f, 100.0f);
 	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
-	//frustum.SetHorizontalFovAndAspectRatio(fov, (w / h));
+	frustum.SetHorizontalFovAndAspectRatio(fov, (w / h));
 }
 
 

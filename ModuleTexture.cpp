@@ -21,12 +21,12 @@ bool ModuleTexture::Init()
 	return ret;
 }
 
-GLuint ModuleTexture::LoadTexture(const char* image_file_name, const char* route_path, const char* route_fbx) {
+GLuint ModuleTexture::LoadTexture(const char* image_file_name, const char* route_path, const char* route_fbx, std::string &size_data) {
 	GLuint image;
 	HRESULT res;
 	const int size_image_file_name = strlen(image_file_name);
 	//First Load full 
-	image = FullLoadFromRoute(image_file_name, res);
+	image = FullLoadFromRoute(image_file_name, res, size_data);
 
 	App->console->AddToConsole("------CHARGING NEW TEXTURE------");
 	if (FAILED(res)) {
@@ -38,7 +38,7 @@ GLuint ModuleTexture::LoadTexture(const char* image_file_name, const char* route
 		strcpy(fbx, route_fbx);
 		strcat(fbx, image_file_name);
 
-		image = FullLoadFromRoute(fbx, res);
+		image = FullLoadFromRoute(fbx, res, size_data);
 		if (FAILED(res)) {
 			const char* log = "Not Found at the route from PBX"; //+ route_fbx + "/" + image_file_name ;
 			App->console->AddToConsole(log);
@@ -47,7 +47,7 @@ GLuint ModuleTexture::LoadTexture(const char* image_file_name, const char* route
 			char* ret = new char[strlen(image_file_name) + 10 + 1 + 1]; // + 1 char + 1 for null;
 			strcpy(ret, "Textures\\");
 			strcat(ret, image_file_name);
-			image = FullLoadFromRoute(ret, res);
+			image = FullLoadFromRoute(ret, res, size_data);
 			if (!FAILED(res))
 			{
 				App->console->AddToConsole("Loaded Texture from Texture Carpet");
@@ -74,7 +74,7 @@ GLuint ModuleTexture::LoadTexture(const char* image_file_name, const char* route
 }
 
 
-GLuint ModuleTexture::FullLoadFromRoute(const char* rute_image_file_name, HRESULT &res) {
+GLuint ModuleTexture::FullLoadFromRoute(const char* rute_image_file_name, HRESULT &res, std::string& size_data) {
 	GLuint textureID=0;
 	ScratchImage sImage;
 	wchar_t* w_image = new wchar_t[strlen(rute_image_file_name) + 1];
@@ -99,7 +99,7 @@ GLuint ModuleTexture::FullLoadFromRoute(const char* rute_image_file_name, HRESUL
 		ScratchImage flipImage;
 		FlipRotate(sImage.GetImages(), sImage.GetImageCount(), sImage.GetMetadata(), TEX_FR_FLIP_VERTICAL, flipImage);
 		const Image* image = flipImage.GetImage(0, 0, 0);
-
+		size_data = to_string(image->width) + " x " + to_string(image->height);
 		//Create and Bind texture
 		glGenTextures(1, &textureID);
 		glBindTexture(GL_TEXTURE_2D, textureID);

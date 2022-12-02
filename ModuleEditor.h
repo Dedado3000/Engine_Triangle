@@ -2,6 +2,8 @@
 
 #include "Module.h"
 #include "Globals.h"
+#include <iostream>
+#include <string>
 
 
 class ModuleEditor : public Module
@@ -20,6 +22,12 @@ public:
 	boolean editorWindows = true;
 
 private:
+
+	//Geometry Information
+	std::string geometryLoaded;
+	std::string textureLoaded;
+	std::string triangleCount;
+	std::string textureSize;
 
 	float scale = 1.f;
 	update_status continueUpdate = UPDATE_CONTINUE;

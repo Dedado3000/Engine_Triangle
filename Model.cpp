@@ -1,10 +1,13 @@
+
 #include "Model.h"
 #include "Application.h"
 #include "ModuleTexture.h"
 #include "ModuleConsole.h"
 
+
 #include "assimp/cimport.h"
 #include "assimp/postprocess.h"
+#include <string>
 
 using namespace std;
 
@@ -33,13 +36,22 @@ void Model::Load(const char* file_name)
 		App->console->AddToConsole("Error loading:");
 		App->console->AddToConsole(aiGetErrorString());
 	}
-	
+
+	totalTriangles = 0;
+	for (int v : meshScene.num_indexV)
+	{
+		totalTriangles += v / 3;
+	}
+	file = file_name;
+	//App->editor->ChangedGeometry(file_name, texture_name, totalTriangles+"", "");
+
 }
 
 void Model::ReLoad(const char* file_name)
 {
 	materials.clear();
-	scene = aiImportFile(file_name, aiProcessPreset_TargetRealtime_MaxQuality);
+	Load(file_name);
+	/*scene = aiImportFile(file_name, aiProcessPreset_TargetRealtime_MaxQuality);
 	if (scene)
 	{
 		LoadMaterials(scene, file_name);
@@ -50,7 +62,7 @@ void Model::ReLoad(const char* file_name)
 		LOG_APP("Error loading %s: %s", file_name, aiGetErrorString());
 		App->console->AddToConsole("Error loading:");
 		App->console->AddToConsole(aiGetErrorString());
-	}
+	}*/
 
 }
 
@@ -94,7 +106,8 @@ void Model::LoadMaterials(const aiScene* scene, const char* file_name)
 	{
 		if (scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &file) == AI_SUCCESS)
 		{
-			materials.push_back(App->textures->LoadTexture(file.data, "", fbx));
+			texture_name = file.data;
+			materials.push_back(App->textures->LoadTexture(file.data, "", fbx,texturesSize));
 		}
 	}
 }
@@ -102,4 +115,12 @@ void Model::LoadMaterials(const aiScene* scene, const char* file_name)
 void Model::Draw()
 {
 	meshScene.Draw(materials);
+}
+
+
+void Model::GetGeometry(std::string &geometry, std::string &texture, std::string &triangles, std::string &textureSize) {
+	geometry = file;
+	texture = texture_name;
+	triangles = to_string(totalTriangles);
+	textureSize = texturesSize+"";
 }
