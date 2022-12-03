@@ -15,8 +15,8 @@ public:
 	// Destructor
 	virtual ~ModuleWindow();
 
-	// Called before quitting
 	bool Init();
+	update_status PreUpdate();
 
 	// Called before quitting
 	bool CleanUp();
@@ -27,6 +27,9 @@ public:
 
 	//The surface contained by the window
 	SDL_Surface* screen_surface = NULL;
+
+	int height, width, lastHeight, lastWidth;
+	int maxHeight, maxWidth;
 };
 
 #endif // __ModuleWindow_H__

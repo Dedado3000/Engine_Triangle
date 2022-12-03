@@ -5,6 +5,7 @@
 #include "ModuleInput.h"
 #include "ModuleRender.h"
 #include "ModuleEditor.h"
+#include "ModuleTexture.h"
 #include "ModuleConsole.h"
 #include "ModuleRenderExercise.h"
 #include "imgui_impl_sdl.h"
@@ -90,7 +91,16 @@ update_status ModuleInput::PreUpdate()
                     App->camera->FocusPoint();
                 }
                 else {
-                    App->console->AddToConsole("Format not valid, please use FBX format");
+                    string sizeData = "";
+                    GLuint idTexture=App->textures->LoadTexture(sdlEvent.drop.file, "", "", sizeData);
+                    if (idTexture != 0)
+                    {
+                        App->renderExercise->chargedModel.ReloadMaterial(idTexture, sdlEvent.drop.file, sizeData);
+                    }
+                    else {
+                    App->console->AddToConsole("Format not valid, please use FBX or texture format");
+
+                    }
                 }
                 break;
             case SDL_KEYDOWN:

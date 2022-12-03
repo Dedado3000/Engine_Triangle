@@ -15,10 +15,12 @@ public:
 
 	void Load(const char* file_name);
 	void ReLoad(const char* file_name);
-	void LoadMaterials(const aiScene* scene, const char* file_name);
+	void LoadMaterials(const aiScene* scene, const char* &file_name);
+	void ReloadMaterial(unsigned mat, const char* nameMaterial, std::string sizeDate);
 
 	void Draw();
 	void GetGeometry(std::string &geometry, std::string &texture, std::string &triangles, std::string &textureSize);
+
 
 	std::vector<unsigned> materials;
 	Mesh meshScene;

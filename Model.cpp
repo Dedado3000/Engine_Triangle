@@ -66,7 +66,7 @@ void Model::ReLoad(const char* file_name)
 
 }
 
-void Model::LoadMaterials(const aiScene* scene, const char* file_name)
+void Model::LoadMaterials(const aiScene* scene, const char* &file_name)
 {
 	aiString file;
 	materials.reserve(scene->mNumMaterials);
@@ -79,7 +79,7 @@ void Model::LoadMaterials(const aiScene* scene, const char* file_name)
 	char* route_fbx;
 	if (route.find("//") != string::npos )
 	{
-		pos = route.find("//");
+		pos = route.find_last_of("//");
 	}
 	else if (route.find("\\") != string::npos)
 	{
@@ -106,10 +106,57 @@ void Model::LoadMaterials(const aiScene* scene, const char* file_name)
 	{
 		if (scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &file) == AI_SUCCESS)
 		{
-			texture_name = file.data;
-			materials.push_back(App->textures->LoadTexture(file.data, "", fbx,texturesSize));
+
+			//Calculate the route from material
+			route = file.data;
+			const char* mat;
+			pos = 0;
+			char* route_mat;
+			const char* material;
+			if (route.find("//") != string::npos)
+			{
+				pos = route.find_last_of("//");
+			}
+			else if (route.find("\\") != string::npos)
+			{
+				pos = route.find_last_of("\\");
+			}
+			if (pos != 0)
+			{
+				route_mat = new char[pos + 1];
+				memmove(route_mat, file.data, pos + 1);
+				route_mat[pos + 1] = 0;
+				for (int i = 0; i < pos + 1; i++) {
+					char character = route_mat[i];
+					if (route_mat[i] == '\\')
+						route_mat[i] = '//';
+				}
+				mat = route_mat;
+
+				texture_name = file.data;
+				char* matPointer = file.data;
+
+				memmove(matPointer, matPointer +pos+1, strlen(file.data));
+				material = matPointer;
+				texture_name = material;
+			}
+			else {
+				mat = "";
+				texture_name = file.data;
+				material = file.data;
+			}
+
+			materials.push_back(App->textures->LoadTexture(material, mat, fbx,texturesSize));
 		}
 	}
+}
+
+void Model::ReloadMaterial(unsigned mat, const char* nameMaterial, string sizeDate) {
+
+	materials.clear();
+	materials.push_back(mat);
+	texture_name = nameMaterial;
+	texturesSize = sizeDate;
 }
 
 void Model::Draw()

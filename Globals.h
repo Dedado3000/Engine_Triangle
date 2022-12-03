@@ -18,5 +18,5 @@ enum update_status
 #define SCREEN_HEIGHT 720
 #define FULLSCREEN false
 #define VSYNC true
-#define TITLE "Super Awesome Engine"
+#define TITLE "TRIANGLE - David Martin Sala Engine"
 #define FPS 60

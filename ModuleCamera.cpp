@@ -87,27 +87,27 @@ update_status ModuleCamera::PreUpdate()
 
 		if (keyboard[SDL_SCANCODE_Q])
 		{
-			position -= float3(0, 4 * App->dt * speed, 0);
+			position -= float3(0, 4 * App->dt * speed * movementSpeed, 0);
 		}
 		if (keyboard[SDL_SCANCODE_E])
 		{
-			position -= float3(0, -4 * App->dt * speed, 0);
+			position -= float3(0, -4 * App->dt * speed * movementSpeed, 0);
 		}
 		if (keyboard[SDL_SCANCODE_W])
 		{
-			position -= float3(-f.x * App->dt * 4 * speed, -f.y * App->dt * 4 * speed, -f.z * App->dt * 4 * speed);
+			position -= float3(-f.x * App->dt * 4 * speed * movementSpeed, -f.y * App->dt * 4 * speed, -f.z * App->dt * 4 * speed * movementSpeed);
 		}
 		if (keyboard[SDL_SCANCODE_S])
 		{
-			position += float3(-f.x * App->dt * 4 * speed, -f.y * App->dt * 4 * speed, -f.z * App->dt * 4 * speed);
+			position += float3(-f.x * App->dt * 4 * speed * movementSpeed, -f.y * App->dt * 4 * speed, -f.z * App->dt * 4 * speed * movementSpeed);
 		}
 		if (keyboard[SDL_SCANCODE_A])
 		{
-			position += float3(-fLat.x * App->dt * 4 * speed, -fLat.y * App->dt * 4 * speed, -fLat.z * App->dt * 4 * speed);
+			position += float3(-fLat.x * App->dt * 4 * speed * movementSpeed, -fLat.y * App->dt * 4 * speed, -fLat.z * App->dt * 4 * speed * movementSpeed);
 		}
 		if (keyboard[SDL_SCANCODE_D])
 		{
-			position -= float3(-fLat.x * App->dt * 4 * speed, -fLat.y * App->dt * 4 * speed, -fLat.z * App->dt * 4 * speed);
+			position -= float3(-fLat.x * App->dt * 4 * speed * movementSpeed, -fLat.y * App->dt * 4 * speed, -fLat.z * App->dt * 4 * speed * movementSpeed);
 		}
 		frustum.SetPos(position);
 
@@ -117,10 +117,10 @@ update_status ModuleCamera::PreUpdate()
 		//we will use the move of the mouse in Y for the 3rd direction and use the X of the mouse for left and right direction
 		if (!keyboard[SDL_SCANCODE_F]) {
 
-			float rotationSpeed = 0.006;
-			float3x3 rotationY = float3x3::RotateY( App->dt * speed * rotationSpeed * moveX);
+			float rotationsSpeed = 0.006;
+			float3x3 rotationY = float3x3::RotateY( App->dt * speed * rotationSpeed * moveX * rotationsSpeed);
 			frustum.SetWorldMatrix(rotationY * frustum.WorldMatrix());
-			float3x3 rotationAxis = float3x3::RotateAxisAngle(frustum.WorldRight(), App->dt * speed * rotationSpeed * moveY);
+			float3x3 rotationAxis = float3x3::RotateAxisAngle(frustum.WorldRight(), App->dt * speed * rotationSpeed * moveY * rotationsSpeed);
 			frustum.SetWorldMatrix(rotationAxis * frustum.WorldMatrix());
 
 		}
@@ -174,7 +174,7 @@ update_status ModuleCamera::PreUpdate()
 		//position += float3(f.x * App->dt * 4 * speed * moveX, f.y * App->dt * 4 * speed * moveX, f.z * App->dt * 4 * speed * moveX);
 		float baseRot = 0.015f;
 		//Moving in XZ 
-		float3 rotationXZ{ -fLat.x * App->dt * speed * moveX * baseRot, /*-fLat.y * App->dt * speed * moveX * baseRot */ 0, -fLat.z * App->dt * speed * moveX * baseRot };
+		float3 rotationXZ{ -fLat.x * App->dt * speed * moveX * baseRot * movementSpeed, /*-fLat.y * App->dt * speed * moveX * baseRot */ 0, -fLat.z * App->dt * speed * moveX * baseRot * movementSpeed };
 		position += rotationXZ;
 		float3 rotationY{ 0, App->dt * speed * moveY * baseRot , 0 };
 		position += rotationY;

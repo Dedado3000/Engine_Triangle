@@ -75,7 +75,10 @@ update_status ModuleEditor::Update()
 			return UPDATE_STOP;
 
 		if (ImGui::MenuItem("About"))
+		{
 			App->console->AddToConsole("Visit the github page: https://github.com/Dedado3000/Engine_Triangle");
+			ShellExecute(0, 0, "https://github.com/Dedado3000/Engine_Triangle", 0, 0, SW_SHOW);
+		}
 
 
 		if (ImGui::MenuItem("Editor"))
@@ -127,8 +130,9 @@ update_status ModuleEditor::Update()
 			ImGui::Text("Software");
 			//SDL version
 			
-			string sSdl = "";//SDL_GetVersion(SDL2::Version->new());
-			sSdl = "SDL Version: " + sSdl;
+			SDL_version* ver = new SDL_version();
+			SDL_VERSION(ver);
+			string sSdl = "SDL Version: Version " + to_string(ver->major) + "." + to_string(ver->minor) + "." + to_string(ver->patch);
 			ImGui::Text(sSdl.c_str());
 
 			//OPENGL version
@@ -149,8 +153,12 @@ update_status ModuleEditor::Update()
 		if (ImGui::Begin("Modules"))
 		{
 			const Uint8* keyboard = App->input->keyboard;
-			ImGui::Text("---Input Module---: ");
-			ImGui::Text("Key Pressing: ");
+			ImGui::Text("---Windows Module---");
+			ImGui::SliderInt("Width", &App->window->width, 100, App->window->maxWidth);
+			ImGui::SliderInt("Heigth", &App->window->height, 100, App->window->maxHeight);
+			ImGui::Text("---Camera Module---");
+			ImGui::SliderInt("Movement Speed", &App->camera->movementSpeed, 1, 10);
+			ImGui::SliderInt("Rotation Speed", &App->camera->rotationSpeed, 1, 10);
 		}
 		ImGui::End();
 
