@@ -118,9 +118,9 @@ update_status ModuleCamera::PreUpdate()
 		if (!keyboard[SDL_SCANCODE_F]) {
 
 			float rotationsSpeed = 0.006;
-			float3x3 rotationY = float3x3::RotateY( App->dt * speed * rotationSpeed * moveX * rotationsSpeed);
+			float3x3 rotationY = float3x3::RotateY( App->dt * speed * rotationSpeed * moveX * rotationsSpeed * freeLook);
 			frustum.SetWorldMatrix(rotationY * frustum.WorldMatrix());
-			float3x3 rotationAxis = float3x3::RotateAxisAngle(frustum.WorldRight(), App->dt * speed * rotationSpeed * moveY * rotationsSpeed);
+			float3x3 rotationAxis = float3x3::RotateAxisAngle(frustum.WorldRight(), App->dt * speed * rotationSpeed * moveY * rotationsSpeed * freeLook);
 			frustum.SetWorldMatrix(rotationAxis * frustum.WorldMatrix());
 
 		}
@@ -182,8 +182,8 @@ update_status ModuleCamera::PreUpdate()
 		//Move the camera forward
 		//Calculate the diference of distance Focus->P1 to distance Focus->P2
 		frustum.SetPos(position);
-		f = frustum.Front();
 		FocusPoint();
+		f = frustum.Front();
 		float distance2 = sqrt(pow(position.x - xVal, 2) + pow(position.y - yVal, 2) + pow(position.z - zVal, 2));
 		float calculatedMovement = distance2 - distance1;
 		position -= float3(-f.x * calculatedMovement, -f.y * calculatedMovement, -f.z *  calculatedMovement);

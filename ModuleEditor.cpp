@@ -159,6 +159,16 @@ update_status ModuleEditor::Update()
 			ImGui::Text("---Camera Module---");
 			ImGui::SliderInt("Movement Speed", &App->camera->movementSpeed, 1, 10);
 			ImGui::SliderInt("Rotation Speed", &App->camera->rotationSpeed, 1, 10);
+			ImGui::Text("Camera mode");
+			if (App->camera->freeLook == 1)
+			{
+				if (ImGui::Button("Normal Mode"))
+					App->camera->freeLook = -1;
+			}
+			else
+				if (ImGui::Button("Inverted Mode"))
+					App->camera->freeLook = 1;
+		
 		}
 		ImGui::End();
 

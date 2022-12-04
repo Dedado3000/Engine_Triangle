@@ -33,6 +33,7 @@ public:
 	int mouseWheel = 0;
 	int movementSpeed = 1;
 	int rotationSpeed = 1;
+	int freeLook = 1;
 	float fov;
 private:
 	Frustum frustum;
