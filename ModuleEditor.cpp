@@ -114,17 +114,34 @@ update_status ModuleEditor::Update()
 			//Ram
 			int ramM = SDL_GetSystemRAM();
 			int ramG = ramM / 1024;
-			string sRam = "System Ram: " + to_string(ramG) +"." + to_string(ramM-ramG*1024) +" GB";
+			string sRam = "System Ram: " + to_string(ramG) + "." + to_string(ramM - ramG * 1024) + " GB";
 			ImGui::Text(sRam.c_str());
 			//GPU
 			//ImGui::Text(glGetString(GL_RENDERER));
 			string sGpu = SDL_GetCurrentVideoDriver();
-			sGpu ="GPU: " + sGpu;
+			sGpu = "GPU: " + sGpu;
 			ImGui::Text(sGpu.c_str());
 			//Video Usage
-			int vUs = 0;
-			string sURam = "Ram Usage: " + to_string(vUs);
-			ImGui::Text(sURam.c_str());
+			//int vUs = 0;
+			//string sURam = "Ram Usage: " + to_string(vUs);
+			//ImGui::Text(sURam.c_str());
+
+			ImGui::Text("Caps: ");
+			string caps ="";
+			if (SDL_Has3DNow()) caps+="3DNow,";
+			if (SDL_HasAltiVec()) caps += "Altivec,";
+			if (SDL_HasAVX()) caps += "AVX,";
+			if (SDL_HasAVX2()) caps += "AVX2,";
+			if (SDL_HasMMX()) caps += "MMX,";
+			if (SDL_HasRDTSC()) caps += "RDTSC,";
+			if (SDL_HasSSE()) caps += "SSE,";
+			if (SDL_HasSSE2()) caps += "SSE2,";
+			if (SDL_HasSSE3()) caps += "SSE3,";
+			if (SDL_HasSSE41()) caps += "SSE41,";			
+			if (SDL_HasSSE()) caps += "SSE42,";
+			
+			ImGui::SameLine();
+			ImGui::TextWrapped(caps.c_str());
 
 			ImGui::NewLine();
 			ImGui::Text("Software");
@@ -133,16 +150,16 @@ update_status ModuleEditor::Update()
 			SDL_version* ver = new SDL_version();
 			SDL_VERSION(ver);
 			string sSdl = "SDL Version: Version " + to_string(ver->major) + "." + to_string(ver->minor) + "." + to_string(ver->patch);
-			ImGui::Text(sSdl.c_str());
+			ImGui::TextWrapped(sSdl.c_str());
 
 			//OPENGL version
 			const GLubyte * open = glGetString(GL_VERSION);
 			std::string sOpen((char*)open);
 			sOpen = "OpenGL Version: " + sOpen;
-			ImGui::Text(sOpen.c_str());
+			ImGui::TextWrapped(sOpen.c_str());
 			//Assimp Version
 			string sAssimp = "Assimp Version: assimp-5.2.5";
-			ImGui::Text(sAssimp.c_str());
+			ImGui::TextWrapped(sAssimp.c_str());
 
 
 		}
